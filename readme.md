@@ -7,7 +7,6 @@ This comprehensive guide provides step-by-step instructions to deploy a Flask we
 - **Ubuntu/Debian** based server (though instructions can be adapted for other Linux distributions)
 - **Python 3.8+** installed on your server
 - **Root or sudo** access to the server
-- **Domain name** (optional, but recommended for production)
 
 ## Step 1: Update System and Install Core Dependencies
 
@@ -69,25 +68,29 @@ if __name__ == "__main__":
 Create a script that will start Gunicorn and manage the socket file:
 
 ```bash
-#!/bin/bash
+echo "Setting directory permissions..."
+chmod -R 755 /weatherApp
+chown -R www-data:www-data /weatherApp
 
-echo "starting nginx..."
-sudo systemctl start nginx
+echo "Starting Nginx..."
+nginx -g "daemon off;" &
 
-echo "starting Gunicorn..."
-cd /home/amit/git/amit.orenshtein/python/deployment_weatherApp || exit
+echo "Starting Gunicorn..."
 
-SOCKET_PATH="/var/www/weatherapp/weatherApp.sock"
-SOCKET_GROUP="www-data"
+# Define socket path and user/group settings (set to www-data for Docker)
+SOCKET_PATH="/weatherApp/weatherApp.sock"
 
+# If the socket already exists, remove it
 if [ -e "$SOCKET_PATH" ]; then
     rm "$SOCKET_PATH"
 fi
 
-sg $SOCKET_GROUP -c "umask 002 && /home/amit/git/amit.orenshtein/python/deployment_weatherApp/venv/bin/gunicorn --workers=3 --bind unix:$SOCKET_PATH wsgi:app"
+# Start Gunicorn with the socket binding
+umask 002 && /weatherApp/venv/bin/gunicorn --workers=3 --bind unix:$SOCKET_PATH wsgi:app &
 
-sudo chown $USER:$SOCKET_GROUP "$SOCKET_PATH"
-sudo chmod 660 "$SOCKET_PATH"
+# Set the correct permissions for the Unix socket
+chown www-data:www-data "$SOCKET_PATH"
+chmod 660 "$SOCKET_PATH"
 
 ```
 
@@ -109,7 +112,7 @@ Add the following content:
 
 ```nginx
 server {
-    listen 9090;
+    listen 80;
     server_name _;
 
     location / {
@@ -189,7 +192,7 @@ Configure your firewall to allow HTTP/HTTPS traffic:
 
 ```bash
 sudo apt install -y ufw
-sudo ufw allow 9090/tcp
+sudo ufw allow 80/tcp
 sudo ufw allow ssh  # Don't lock yourself out
 sudo ufw enable
 sudo ufw status
