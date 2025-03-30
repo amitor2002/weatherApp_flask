@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Weather Statistics</title>
+    <!-- Fonts for cool stuff -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='styleResult.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <h1>Weather Information</h1>
+
+    <div class="result"> <!-- Added result class here -->
+        <h2>Weather Information for {{ city }}, {{ country }}</h2>
+        <p>The current temperature is: {{ temperature }}°C</p>
+    </div>
+
+    <!-- Using the back-btn class for the button -->
+    <a href="/" class="back-btn">Back to the homepage</a>
+</body>
+</html>
