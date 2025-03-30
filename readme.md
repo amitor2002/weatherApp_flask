@@ -1,6 +1,6 @@
 # Flask Application Deployment with Nginx and Gunicorn
 
-This comprehensive guide provides step-by-step instructions to deploy a Flask web application in a production environment using Nginx as a reverse proxy and Gunicorn as the WSGI server.
+This guide provides step-by-step instructions to deploy a Flask web application in a production environment using Nginx as a reverse proxy and Gunicorn as the WSGI server.
 
 ## Prerequisites
 
