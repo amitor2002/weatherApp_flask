@@ -1,0 +1,14 @@
+# Stage 1: Build stage
+FROM python:3.13-slim AS build
+ENV PYTHONUNBUFFERED=1
+WORKDIR /app
+COPY app/requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+COPY app/. .
+
+# Stage 2: Runtime stage
+FROM python:3.13-slim AS runtime
+WORKDIR /app
+COPY --from=build /app /app
+
+ENTRYPOINT ["gunicorn", "-b", "0.0.0.0:8000", "-w", "3", "wsgi:app"]
